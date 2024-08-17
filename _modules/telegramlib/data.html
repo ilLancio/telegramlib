@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>telegramlib.data &#8212; telegramlib 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="canonical" href="https://illancio.github.io/telegramlib/_modules/telegramlib/data.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for telegramlib.data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Data Management Module</span>
+
+<span class="sd">This module provides functions for managing user-specific parameters and retrieving chat history</span>
+<span class="sd">within a Telegram bot environment. It allows you to set and get custom parameters for users</span>
+<span class="sd">as well as access and format their chat history according to various criteria.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">_bot_started_check</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">.telegram_warnings</span> <span class="kn">import</span> <span class="n">NonExistentParameterWarning</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;set_param&#39;</span><span class="p">,</span> <span class="s1">&#39;get_param&#39;</span><span class="p">,</span> <span class="s1">&#39;get_chat&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="set_param">
+<a class="viewcode-back" href="../../index.html#telegramlib.set_param">[docs]</a>
+<span class="nd">@_bot_started_check</span>
+<span class="k">def</span> <span class="nf">set_param</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the value of a user custom parameter.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    key : any</span>
+<span class="sd">        The key name of the parameter to be set. It must be one of the keys in the default parameter dictionary.</span>
+<span class="sd">    value : any</span>
+<span class="sd">        The value to be associated with the key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">]</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_system_params</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">NonExistentParameterWarning</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+        <span class="k">return</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="get_param">
+<a class="viewcode-back" href="../../index.html#telegramlib.get_param">[docs]</a>
+<span class="nd">@_bot_started_check</span>
+<span class="k">def</span> <span class="nf">get_param</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the value of a user custom parameter.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    key : any</span>
+<span class="sd">        The key name of the parameter whose value you want to get. It must be one of the keys in the default parameter dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    any</span>
+<span class="sd">        The value associated with the key name parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">]</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_system_params</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">NonExistentParameterWarning</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+        <span class="k">return</span>
+    <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">][</span><span class="n">key</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_chat">
+<a class="viewcode-back" href="../../index.html#telegramlib.get_chat">[docs]</a>
+<span class="nd">@_bot_started_check</span>
+<span class="k">def</span> <span class="nf">get_chat</span><span class="p">(</span><span class="n">user</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">last</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">last_message</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_char</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">to_string</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">to_list</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">only_name_keys</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">without_keys</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the chat history of a user.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    user : int or str or None, optional</span>
+<span class="sd">        user_id of the user whose chat to get or `None` (default) to use `config._user_id`.</span>
+<span class="sd">    last : int or str or None, optional</span>
+<span class="sd">        Number of last messages or last `&quot;day&quot;`, `&quot;month&quot;`, or `&quot;year&quot;` time frame (default is `None`).</span>
+<span class="sd">    last_message : str, optional</span>
+<span class="sd">        Last message of which you want to get the next ones (default is `None`).</span>
+<span class="sd">    max_char : int, optional</span>
+<span class="sd">        Maximum number of characters to be obtained (default is `None`).</span>
+<span class="sd">    to_string : bool, optional</span>
+<span class="sd">        `True` to return the chat in string format (default is `False`).</span>
+<span class="sd">    to_list : bool, optional</span>
+<span class="sd">        `True` to return the chat in list format (default is `False`).</span>
+<span class="sd">    only_name_keys : bool, optional</span>
+<span class="sd">        `True` to return chat with keys containing only names (default is `False`).</span>
+<span class="sd">    without_keys : bool, optional</span>
+<span class="sd">        `True` to return the chat with only message contents (default is `False`).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict or str or list</span>
+<span class="sd">        The user&#39;s chat in the specified format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">_user_id</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span> <span class="nf">add_start_dict</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">d0</span><span class="p">):</span>
+        <span class="n">d0</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d0</span>
+
+    <span class="k">def</span> <span class="nf">flatten_dict</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">new_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parent_key</span><span class="si">}{</span><span class="n">sep</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">parent_key</span> <span class="k">else</span> <span class="n">k</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flatten_dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">new_key</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">new_key</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">unflatten_dict</span><span class="p">(</span><span class="n">flat_dict</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+        <span class="n">nested_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">flat_key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">flat_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">flat_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">nested_dict</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">nested_dict</span>
+
+    <span class="n">chat</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">user</span><span class="p">][</span><span class="s1">&#39;chat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">last</span> <span class="o">==</span> <span class="s1">&#39;day&#39;</span><span class="p">:</span>
+        <span class="n">chat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="n">chat</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">last</span> <span class="o">==</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span>
+        <span class="n">chat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="n">chat</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">last</span> <span class="o">==</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span>
+        <span class="n">chat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">chat</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">l</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">items</span> <span class="o">=</span> <span class="p">[],</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">[]</span>
+    <span class="n">n_line</span> <span class="o">=</span> <span class="n">n_char</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">flatten_dict</span><span class="p">(</span><span class="n">chat</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="n">n_line</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">n_char</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_[&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">value</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">last_message</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">last</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_line</span> <span class="o">&gt;</span> <span class="n">last</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">max_char</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_char</span> <span class="o">&gt;</span> <span class="n">max_char</span><span class="p">):</span>
+            <span class="k">break</span>
+            
+        <span class="k">if</span> <span class="n">only_name_keys</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">without_keys</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">to_list</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">to_string</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">only_name_keys</span> <span class="ow">or</span> <span class="n">without_keys</span><span class="p">:</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">add_start_dict</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">})</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">without_keys</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">+=</span> <span class="s1">&#39;: &#39;</span>
+
+        <span class="k">if</span> <span class="n">to_list</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">key</span> <span class="o">+</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">to_string</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="n">value</span> <span class="o">+</span> <span class="n">s</span>
+
+    <span class="k">if</span> <span class="n">to_list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">l</span>
+    <span class="k">if</span> <span class="n">to_string</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">only_name_keys</span> <span class="ow">or</span> <span class="n">without_keys</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">items</span>
+    <span class="k">return</span> <span class="n">unflatten_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">telegramlib</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.config.html">telegramlib.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.core.html">telegramlib.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.data.html">telegramlib.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.commands.html">telegramlib.commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.jobs.html">telegramlib.jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.telegram_exceptions.html">telegramlib.telegram_exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.telegram_warnings.html">telegramlib.telegram_warnings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.utils.html">telegramlib.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.text_to_speech.html">telegramlib.text_to_speech</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.translator.html">telegramlib.translator</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.start_bot.html">telegramlib.start_bot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.command_args.html">telegramlib.command_args</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.bot_reply_text.html">telegramlib.bot_reply_text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.send.html">telegramlib.send</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.delete.html">telegramlib.delete</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.context.html">telegramlib.context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.update.html">telegramlib.update</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.bot_name.html">telegramlib.bot_name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.set_param.html">telegramlib.set_param</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.get_param.html">telegramlib.get_param</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.get_chat.html">telegramlib.get_chat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.admin_command.html">telegramlib.admin_command</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.controllers_command.html">telegramlib.controllers_command</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.terminal.html">telegramlib.terminal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.follow.html">telegramlib.follow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.unfollow.html">telegramlib.unfollow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.write.html">telegramlib.write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.ban.html">telegramlib.ban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.sban.html">telegramlib.sban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.creator.html">telegramlib.creator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.closecreator.html">telegramlib.closecreator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.new_daily_job_from_args.html">telegramlib.new_daily_job_from_args</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.get_command_args_daily_job_time_format.html">telegramlib.get_command_args_daily_job_time_format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.is_daily_job_scheduled.html">telegramlib.is_daily_job_scheduled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.daily_jobs_scheduled_times_to_string.html">telegramlib.daily_jobs_scheduled_times_to_string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.remove_all_daily_jobs.html">telegramlib.remove_all_daily_jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.new_daily_job.html">telegramlib.new_daily_job</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Daniele Lanciotti.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

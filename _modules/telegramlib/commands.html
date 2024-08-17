@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>telegramlib.commands &#8212; telegramlib 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="canonical" href="https://illancio.github.io/telegramlib/_modules/telegramlib/commands.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for telegramlib.commands</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Telegram Bot Command Module</span>
+<span class="sd">===========================</span>
+
+<span class="sd">This module provides functionality for defining and handling default commands within a Telegram bot.</span>
+<span class="sd">It includes decorators to restrict access to certain commands based on user roles and functions to</span>
+<span class="sd">perform specific actions such as executing terminal commands, managing user follow lists, sending</span>
+<span class="sd">messages, and banning users.</span>
+
+<span class="sd">Usage</span>
+<span class="sd">-----</span>
+<span class="sd">To make these commands usables, it is necessary to add them to the command list during bot start in start_bot function.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">_bot_started_check</span><span class="p">,</span> <span class="n">send</span><span class="p">,</span> <span class="n">bot_reply_text</span>
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">bot_name</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">.data</span> <span class="kn">import</span> <span class="n">get_chat</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;admin_command&#39;</span><span class="p">,</span> <span class="s1">&#39;controllers_command&#39;</span><span class="p">,</span> <span class="s1">&#39;terminal&#39;</span><span class="p">,</span> <span class="s1">&#39;follow&#39;</span><span class="p">,</span> <span class="s1">&#39;unfollow&#39;</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">,</span> <span class="s1">&#39;ban&#39;</span><span class="p">,</span> <span class="s1">&#39;sban&#39;</span><span class="p">,</span> <span class="s1">&#39;creator&#39;</span><span class="p">,</span> <span class="s1">&#39;closecreator&#39;</span><span class="p">]</span>
+
+<span class="c1"># decorator</span>
+<div class="viewcode-block" id="admin_command">
+<a class="viewcode-back" href="../../index.html#telegramlib.admin_command">[docs]</a>
+<span class="k">def</span> <span class="nf">admin_command</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to restrict command execution to the bot&#39;s admin.</span>
+
+<span class="sd">    This decorator checks if the current user is the admin before executing</span>
+<span class="sd">    the decorated function. It ensures that only the admin can perform certain</span>
+<span class="sd">    sensitive actions, such as managing users or executing system commands.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        The function to be wrapped and executed only by the admin.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wrapper : function</span>
+<span class="sd">        The wrapped function with admin check applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="nd">@_bot_started_check</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_user_id</span> <span class="o">==</span> <span class="n">config</span><span class="o">.</span><span class="n">_admin</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">func</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<span class="c1"># decorator</span>
+<div class="viewcode-block" id="controllers_command">
+<a class="viewcode-back" href="../../index.html#telegramlib.controllers_command">[docs]</a>
+<span class="k">def</span> <span class="nf">controllers_command</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to restrict command execution to users listed as controllers.</span>
+
+<span class="sd">    This decorator allows only users identified as controllers in the bot&#39;s</span>
+<span class="sd">    configuration to execute the decorated function. Controllers have a higher</span>
+<span class="sd">    level of access compared to regular users but less than the admin.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        The function to be wrapped and executed only by controllers.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wrapper : function</span>
+<span class="sd">        The wrapped function with controller check applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="nd">@_bot_started_check</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_user_id</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_controllers</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">func</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="terminal">
+<a class="viewcode-back" href="../../index.html#telegramlib.terminal">[docs]</a>
+<span class="nd">@admin_command</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">terminal</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes terminal commands as the admin.</span>
+
+<span class="sd">    This function allows the admin to execute system-level commands directly</span>
+<span class="sd">    from the chat. It filters out the initial bot command and &#39;sudo&#39; keyword</span>
+<span class="sd">    for security reasons. The output of the command is sent back to the chat.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    /command ls -la</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">update</span><span class="p">()</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">((</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="fm">__ne__</span><span class="p">,</span> <span class="n">command</span><span class="p">))</span> <span class="c1"># elimina dalla lista tutti gli elementi stringa vuota: &#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">command</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="s1">&#39;sudo&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">command</span><span class="p">:</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;b&gt;Execute&lt;/b&gt;: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">universal_newlines</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;b&gt;Error&lt;/b&gt;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">send</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="follow">
+<a class="viewcode-back" href="../../index.html#telegramlib.follow">[docs]</a>
+<span class="nd">@admin_command</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">follow</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds users to the admin&#39;s list of followed users.</span>
+
+<span class="sd">    This function allows the admin to follow specific users, meaning he</span>
+<span class="sd">    will receive messages sent from these users to the bot. It adds the</span>
+<span class="sd">    specified users to the `config._users_to_send_to_admin` list and</span>
+<span class="sd">    provides recent chat history.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    /follow &lt;user_id_1&gt; &lt;user_id_2&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">_users_to_send_to_admin</span> <span class="o">+=</span> <span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span>
+    <span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;following: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">_users_to_send_to_admin</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+            <span class="n">send</span><span class="p">(</span> <span class="s1">&#39;&lt;b&gt;&#39;</span> <span class="o">+</span> <span class="n">user</span> <span class="o">+</span> <span class="s1">&#39;&lt;/b&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>  <span class="n">get_chat</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">last</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">to_string</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">only_name_keys</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="unfollow">
+<a class="viewcode-back" href="../../index.html#telegramlib.unfollow">[docs]</a>
+<span class="nd">@admin_command</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">unfollow</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes users from the admin&#39;s list of followed users.</span>
+
+<span class="sd">    This function removes the specified users from the list of followed users.</span>
+<span class="sd">    If no users are specified, it clears the entire list.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    /unfollow &lt;user_id_1&gt; &lt;user_id_2&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">_users_to_send_to_admin</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_users_to_send_to_admin</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">_users_to_send_to_admin</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+    <span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;following: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">_users_to_send_to_admin</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write">
+<a class="viewcode-back" href="../../index.html#telegramlib.write">[docs]</a>
+<span class="nd">@admin_command</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">write</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sends a message to a specified user from the admin.</span>
+
+<span class="sd">    This function allows the admin to send a custom message to any user.</span>
+<span class="sd">    It takes the user ID (or &#39;all&#39;) and the message text as arguments.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    /write &lt;user_id&gt; Hello! How are you?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;No messages sent&#39;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">send</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+    <span class="n">send</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ban">
+<a class="viewcode-back" href="../../index.html#telegramlib.ban">[docs]</a>
+<span class="nd">@admin_command</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">ban</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Bans specified users from the bot.</span>
+
+<span class="sd">    This function sets a &#39;ban&#39; flag for each specified user, preventing them</span>
+<span class="sd">    from interacting with the bot.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    /ban &lt;user_id_1&gt; &lt;user_id_2&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s1">&#39;ban&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">banned</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s1">&#39;ban&#39;</span><span class="p">]</span> <span class="p">]</span>
+    <span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;banned: </span><span class="si">{</span><span class="n">banned</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sban">
+<a class="viewcode-back" href="../../index.html#telegramlib.sban">[docs]</a>
+<span class="nd">@admin_command</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">sban</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Unbans all or specified users from the bot.</span>
+
+<span class="sd">    This function removes the &#39;ban&#39; flag from all users if no arguments are provided,</span>
+<span class="sd">    or from the specified users if arguments are given.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    /sban &lt;user_id_1&gt; &lt;user_id_2&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s1">&#39;ban&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">context</span><span class="p">()</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s1">&#39;ban&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">banned</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">id</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s1">&#39;ban&#39;</span><span class="p">]</span> <span class="p">]</span>
+    <span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;banned: </span><span class="si">{</span><span class="n">banned</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="creator">
+<a class="viewcode-back" href="../../index.html#telegramlib.creator">[docs]</a>
+<span class="nd">@_bot_started_check</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">creator</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initiates a direct conversation with the bot&#39;s creator.</span>
+
+<span class="sd">    This function notifies the admin that a user wants to initiate a conversation.</span>
+<span class="sd">    It adds the user to the list of users to send messages to the admin and provides</span>
+<span class="sd">    a prompt indicating that they are now talking to the bot&#39;s creator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">_users_to_send_to_admin</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">_creator_users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">)</span>
+    <span class="n">send</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;b&gt;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">_who</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="si">}</span><span class="s1">) VUOLE PARLARE CON TE&lt;/b&gt;&#39;</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">bot_reply_text</span><span class="p">(</span><span class="s1">&#39;You are now talking to the creator of the bot, you can ask what you need and wait for his answer&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="closecreator">
+<a class="viewcode-back" href="../../index.html#telegramlib.closecreator">[docs]</a>
+<span class="nd">@_bot_started_check</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">closecreator</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ends the conversation with the bot&#39;s creator.</span>
+
+<span class="sd">    This function removes the user from the list of users having a direct</span>
+<span class="sd">    conversation with the bot&#39;s creator and provides a message indicating</span>
+<span class="sd">    that the conversation is closed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_user_id</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_creator_users</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">_creator_users</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">bot_reply_text</span><span class="p">(</span><span class="s1">&#39;Conversation closed, now what you write will only be read by &#39;</span> <span class="o">+</span> <span class="n">bot_name</span><span class="p">())</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">telegramlib</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.config.html">telegramlib.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.core.html">telegramlib.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.data.html">telegramlib.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.commands.html">telegramlib.commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.jobs.html">telegramlib.jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.telegram_exceptions.html">telegramlib.telegram_exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.telegram_warnings.html">telegramlib.telegram_warnings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.utils.html">telegramlib.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.text_to_speech.html">telegramlib.text_to_speech</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.translator.html">telegramlib.translator</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.start_bot.html">telegramlib.start_bot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.command_args.html">telegramlib.command_args</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.bot_reply_text.html">telegramlib.bot_reply_text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.send.html">telegramlib.send</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.delete.html">telegramlib.delete</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.context.html">telegramlib.context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.update.html">telegramlib.update</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.bot_name.html">telegramlib.bot_name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.set_param.html">telegramlib.set_param</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.get_param.html">telegramlib.get_param</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.get_chat.html">telegramlib.get_chat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.admin_command.html">telegramlib.admin_command</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.controllers_command.html">telegramlib.controllers_command</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.terminal.html">telegramlib.terminal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.follow.html">telegramlib.follow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.unfollow.html">telegramlib.unfollow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.write.html">telegramlib.write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.ban.html">telegramlib.ban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.sban.html">telegramlib.sban</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.creator.html">telegramlib.creator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.closecreator.html">telegramlib.closecreator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.new_daily_job_from_args.html">telegramlib.new_daily_job_from_args</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.get_command_args_daily_job_time_format.html">telegramlib.get_command_args_daily_job_time_format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.is_daily_job_scheduled.html">telegramlib.is_daily_job_scheduled</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.daily_jobs_scheduled_times_to_string.html">telegramlib.daily_jobs_scheduled_times_to_string</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.remove_all_daily_jobs.html">telegramlib.remove_all_daily_jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/telegramlib.new_daily_job.html">telegramlib.new_daily_job</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Daniele Lanciotti.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
