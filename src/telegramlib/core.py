@@ -60,7 +60,8 @@ def start_bot(
         Controller user_id/user_ids (default is `None`).
     params : dict or None, optional
         Users' default parameters (default is `None`).
-
+    privacy : bool, optional
+        `False` to enable user tracking (default is `True`).
     Raises
     ------
     MissingStartCommandError
@@ -426,7 +427,7 @@ def _save_user_in_data(user):
 
 async def _save_profile_photo():
     """
-    Saves profile photo of the user to ./photos/user_id/.
+    Saves profile photo of the user to ./photos/user_id/ (only if privacy is turned off).
 
     This function is private and should not be used directly by users of the package.
 
@@ -451,7 +452,7 @@ async def _save_profile_photo():
 
 def _save_text_message_in_data(message = None, message_id = None, user_id = None, is_text_to_audio = False):
     """
-    Saves text message to config._data dict.
+    Saves text message to config._data dict (only if privacy is turned off).
 
     This function is private and should not be used directly by users of the package.
 
