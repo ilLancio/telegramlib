@@ -71,7 +71,8 @@
         <span class="n">scheduled</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">controllers</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">privacy</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Most important function needed to start the bot.</span>
@@ -94,14 +95,15 @@
 <span class="sd">        Controller user_id/user_ids (default is `None`).</span>
 <span class="sd">    params : dict or None, optional</span>
 <span class="sd">        Users&#39; default parameters (default is `None`).</span>
-
+<span class="sd">    privacy : bool, optional</span>
+<span class="sd">        `False` to enable user tracking (default is `True`).</span>
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    MissingStartCommandError</span>
 <span class="sd">        If the function is executed before the bot starts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">config</span><span class="o">.</span><span class="n">_token</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_admin</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_scheduled_functions</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_controllers</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_default_params</span> <span class="o">=</span> <span class="n">token</span><span class="p">,</span> <span class="n">admin</span><span class="p">,</span> <span class="n">scheduled</span><span class="p">,</span> <span class="n">controllers</span><span class="p">,</span> <span class="n">params</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">_token</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_admin</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_scheduled_functions</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_controllers</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_default_params</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_privacy</span> <span class="o">=</span> <span class="n">token</span><span class="p">,</span> <span class="n">admin</span><span class="p">,</span> <span class="n">scheduled</span><span class="p">,</span> <span class="n">controllers</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">privacy</span>
 
     <span class="n">application</span> <span class="o">=</span> <span class="n">ApplicationBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_token</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 
@@ -397,18 +399,18 @@
 <span class="sd">    context : telegram.Context</span>
 <span class="sd">        python-telgram-bot context object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="n">sec</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timetuple</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())[:</span><span class="mi">6</span><span class="p">]</span>
-    <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">  %I:%M %p&#39;</span><span class="p">)</span>
-
     <span class="n">config</span><span class="o">.</span><span class="n">_update</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">_context</span> <span class="o">=</span> <span class="n">update</span><span class="p">,</span> <span class="n">context</span>
-
-    <span class="n">user</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">from_user</span>
 
     <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_message_to_delete_in_init</span><span class="p">:</span>
         <span class="n">delete</span><span class="p">(</span><span class="n">message</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">message</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">config</span><span class="o">.</span><span class="n">_message_to_delete_in_init</span> <span class="o">=</span> <span class="p">[]</span>
 
+    <span class="n">user</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">from_user</span>
     <span class="n">_save_user_in_data</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_privacy</span><span class="p">:</span>
+        <span class="k">return</span>
+
     <span class="k">await</span> <span class="n">_save_profile_photo</span><span class="p">()</span>
 
     <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
@@ -460,10 +462,12 @@
         <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_default_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span> <span class="n">config</span><span class="o">.</span><span class="n">_default_params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>
         <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_privacy</span><span class="p">:</span>
+            <span class="k">return</span>
         <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">][</span><span class="s1">&#39;info&#39;</span><span class="p">][</span><span class="n">time</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_dict</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;NEW USER&#39;</span><span class="si">:</span><span class="s2">-^20</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">stringUser</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">send</span><span class="p">(</span> <span class="sa">f</span><span class="s1">&#39;&lt;b&gt;NEW USER&lt;/b&gt;</span><span class="se">\n</span><span class="si">{</span><span class="n">stringUser</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">[</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_controllers</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="s1">&#39;usersupdates&#39;</span><span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">user_dict</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">][</span><span class="s1">&#39;info&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">_privacy</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">][</span><span class="s1">&#39;info&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">user_dict</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">][</span><span class="s1">&#39;info&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
         <span class="n">config</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">][</span><span class="s1">&#39;info&#39;</span><span class="p">][</span><span class="n">time</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_dict</span>
         <span class="n">config</span><span class="o">.</span><span class="n">_last_time</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;CHANGED USER INFO&#39;</span><span class="si">:</span><span class="s2">-^20</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">stringUser</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -471,7 +475,7 @@
 
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_save_profile_photo</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Saves profile photo of the user to ./photos/user_id/.</span>
+<span class="sd">    Saves profile photo of the user to ./photos/user_id/ (only if privacy is turned off).</span>
 
 <span class="sd">    This function is private and should not be used directly by users of the package.</span>
 
@@ -480,6 +484,9 @@
 <span class="sd">    user : telegram.User</span>
 <span class="sd">        python-telgram-bot user object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_privacy</span><span class="p">:</span>
+        <span class="k">return</span>
+
     <span class="n">photos</span> <span class="o">=</span> <span class="k">await</span> <span class="n">config</span><span class="o">.</span><span class="n">_context</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">get_user_profile_photos</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">_user_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">photos</span><span class="o">.</span><span class="n">total_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">photoFile</span> <span class="o">=</span> <span class="k">await</span> <span class="n">photos</span><span class="o">.</span><span class="n">photos</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_file</span><span class="p">()</span>
@@ -493,7 +500,7 @@
 
 <span class="k">def</span> <span class="nf">_save_text_message_in_data</span><span class="p">(</span><span class="n">message</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">message_id</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">is_text_to_audio</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Saves text message to config._data dict.</span>
+<span class="sd">    Saves text message to config._data dict (only if privacy is turned off).</span>
 
 <span class="sd">    This function is private and should not be used directly by users of the package.</span>
 
@@ -508,6 +515,9 @@
 <span class="sd">    is_text_to_audio : bool, optional</span>
 <span class="sd">        `True` if the message to be saved that the bot is sending is text converted to audio (default is `False`).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">_privacy</span><span class="p">:</span>
+        <span class="k">return</span>
+
     <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="n">sec</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timetuple</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())]</span>
 
     <span class="n">message_type</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span>

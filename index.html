@@ -38,7 +38,7 @@
 <span id="module-telegramlib"></span><h1>telegramlib<a class="headerlink" href="#telegramlib" title="Link to this heading">¶</a></h1>
 <p>Easiest Python package to create Telegram bots.</p>
 <dl class="simple">
-<dt>Version:</dt><dd><p>0.1.1</p>
+<dt>Version:</dt><dd><p>0.1.2</p>
 </dd>
 <dt>Authors:</dt><dd><p>Daniele Lanciotti (<a class="reference external" href="mailto:daniele9001&#37;&#52;&#48;gmail&#46;com">daniele9001<span>&#64;</span>gmail<span>&#46;</span>com</a>) (<a class="reference external" href="https://illancio.github.io">https://illancio.github.io</a>)</p>
 </dd>
@@ -222,8 +222,17 @@ Then remember to add the command in the <cite>start_bot</cite> function along wi
 Bot:  Bot started!
 </pre></div>
 </div>
+<p>Disable user privacy:</p>
+<p>If you want to save user information, you must explicitly specify it as a parameter
+in the <cite>start_bot</cite> function by setting <cite>privacy=False</cite>, like so: <cite>start_bot(token=TOKEN, …, privacy=False)</cite>.
+User information will be saved in the <cite>database.json</cite> file.</p>
+<p>Legal Disclaimer: User Privacy and Data Handling:</p>
+<p>Please note that you are solely responsible for complying with all applicable data protection and privacy laws.
+This includes, but is not limited to, obtaining user consent where required, securely storing the data,
+and providing users with necessary disclosures regarding how their data will be used.
+The author of this library assumes no liability for any legal consequences arising from the use or misuse of this functionality.</p>
 <p>Disable user updates:</p>
-<p>Being an admin yourself, you will receive informative messages from the bot
+<p>Disabling user privacy and being an admin yourself, you will receive informative messages from the bot
 about the activities of your bot’s users.
 To disable or enable it, send it the <cite>/usersupdates</cite> command.</p>
 </section>
@@ -714,7 +723,7 @@ or from the specified users if arguments are given.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="telegramlib.start_bot">
-<span class="sig-prename descclassname"><span class="pre">telegramlib.</span></span><span class="sig-name descname"><span class="pre">start_bot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheduled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controllers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telegramlib/core.html#start_bot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telegramlib.start_bot" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">telegramlib.</span></span><span class="sig-name descname"><span class="pre">start_bot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheduled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controllers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">privacy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telegramlib/core.html#start_bot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telegramlib.start_bot" title="Link to this definition">¶</a></dt>
 <dd><p>Most important function needed to start the bot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -727,6 +736,7 @@ or from the specified users if arguments are given.</p>
 <li><p><strong>error</strong> (<em>Callable</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Error handler function or <cite>None</cite> (default) to use default _error handler function.</p></li>
 <li><p><strong>controllers</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Controller user_id/user_ids (default is <cite>None</cite>).</p></li>
 <li><p><strong>params</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Users’ default parameters (default is <cite>None</cite>).</p></li>
+<li><p><strong>privacy</strong> (<em>bool</em><em>, </em><em>optional</em>) – <cite>False</cite> to enable user tracking (default is <cite>True</cite>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
