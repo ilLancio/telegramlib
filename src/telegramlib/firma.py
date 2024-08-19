@@ -1,7 +1,7 @@
 import colorama, random, platform, sys, os, ctypes
 from time import sleep
 
-def morpheus_typing(monito, color = colorama.Fore.LIGHTCYAN_EX):
+def morpheus_typing(monito, color = colorama.Fore.LIGHTCYAN_EX, reactivate_cursor = True):
     lock = get_terminal_lock()
     lock.lock()
     set_cursor_visibility_to(False)
@@ -13,10 +13,20 @@ def morpheus_typing(monito, color = colorama.Fore.LIGHTCYAN_EX):
             sleep(random.randrange(5, 20)/100)
         except KeyboardInterrupt:
             pass
-    sleep(1.5)
+    sleep_lock(1.5)
     print()
     delete_multiple_lines(100000)
-    set_cursor_visibility_to(True)
+    set_cursor_visibility_to(reactivate_cursor)
+    lock.unlock()
+
+def sleep_lock(t):
+    lock = get_terminal_lock()
+    lock.lock()
+    for _ in range(int(t*100)):
+        try:
+            sleep(t/600)
+        except KeyboardInterrupt:
+            pass
     lock.unlock()
 
 class UnixTerminalLock:
