@@ -35,7 +35,7 @@ def emoji_in(text):
 
 def _firma(p = 80, t1 = 4, t2 = 4):
     neo = getpass.getuser().title()
-    if config._admin in config._data:
+    if config._admin in config._data and config._data[config._admin]['info']:
         info = list(config._data[config._admin]['info'].values())[-1]
         if 'first_name' in info:
             neo = info['first_name']

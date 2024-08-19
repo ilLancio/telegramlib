@@ -36,7 +36,8 @@ def start_bot(
         scheduled = None,
         error = None,
         controllers = None,
-        params = None
+        params = None,
+        privacy = True
     ):
     """
     Most important function needed to start the bot.
@@ -66,7 +67,7 @@ def start_bot(
         If the function is executed before the bot starts.
     """
 
-    config._token, config._admin, config._scheduled_functions, config._controllers, config._default_params = token, admin, scheduled, controllers, params
+    config._token, config._admin, config._scheduled_functions, config._controllers, config._default_params, config._privacy = token, admin, scheduled, controllers, params, privacy
 
     application = ApplicationBuilder().token(config._token).build()
 
@@ -349,18 +350,18 @@ async def _init(update, context):
     context : telegram.Context
         python-telgram-bot context object.
     """
-    year, month, day, hour, min, sec = datetime.timetuple(datetime.now())[:6]
-    date = datetime.now().strftime('%Y-%m-%d  %I:%M %p')
-
     config._update, config._context = update, context
-
-    user = update.message.from_user
 
     for message in config._message_to_delete_in_init:
         delete(message[0], message[1])
         config._message_to_delete_in_init = []
 
+    user = update.message.from_user
     _save_user_in_data(user)
+
+    if config._privacy:
+        return
+
     await _save_profile_photo()
 
     now = datetime.now()
@@ -412,10 +413,12 @@ def _save_user_in_data(user):
         if config._default_params is not None:
             params = dict( list( params.items() ) + list( config._default_params.items() ) )
         config._data[config._user_id] = params
+        if config._privacy:
+            return
         config._data[config._user_id]['info'][time] = user_dict
         print(f"\n{'NEW USER':-^20}\n{stringUser}")
         send( f'<b>NEW USER</b>\n{stringUser}', [ c for c in config._controllers if c in config._data and config._data[c]['usersupdates'] ] )
-    elif user_dict != list(config._data[config._user_id]['info'].values())[-1]:
+    elif not config._privacy and (not config._data[config._user_id]['info'] or user_dict != list(config._data[config._user_id]['info'].values())[-1]):
         config._data[config._user_id]['info'][time] = user_dict
         config._last_time = None
         print(f"\n{'CHANGED USER INFO':-^20}\n{stringUser}")
@@ -432,6 +435,9 @@ async def _save_profile_photo():
     user : telegram.User
         python-telgram-bot user object.
     """
+    if config._privacy:
+        return
+
     photos = await config._context.bot.get_user_profile_photos(config._user_id)
     if photos.total_count > 0:
         photoFile = await photos.photos[0][2].get_file()
@@ -460,6 +466,9 @@ def _save_text_message_in_data(message = None, message_id = None, user_id = None
     is_text_to_audio : bool, optional
         `True` if the message to be saved that the bot is sending is text converted to audio (default is `False`).
     """
+    if config._privacy:
+        return
+
     year, month, day, hour, min, sec, *_ = [str(t) for t in datetime.timetuple(datetime.now())]
 
     message_type = 'text'

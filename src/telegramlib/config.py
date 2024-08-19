@@ -37,6 +37,8 @@ class Config:
 
         self.__token = self.__admin = self.__controllers = self.__default_params = self.__scheduled_functions = None
 
+        self._privacy = True
+
         self.__system_params = {'info': {}, 'chat': {}, 'jobs': [], 'ban': False}
         self.__controllers_params = {'usersupdates': True}
 
