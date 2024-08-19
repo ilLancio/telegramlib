@@ -207,7 +207,7 @@ Bot:  I am responding to you because you are an admin and an admin is always con
 
 ## Complete List of Functions
 
-* `start_bot(token, admin, commands, messages=None, scheduled=None error=None, controllers = None, params=None)`
+* `start_bot(token, admin, commands, messages=None, scheduled=None error=None, controllers = None, params=None, privacy=True)`
 
   *Start the Telegram bot.*
 
