@@ -61,9 +61,17 @@ User: /start
 Bot:  Bot started!
 ```
 
+#### Disable user privacy
+
+If you want to save user information, you must explicitly specify it as a parameter in the `start_bot` function by setting `privacy=False`, like so: `start_bot(token=TOKEN, ..., privacy=False)`. User information will be saved in the `database.json` file.
+
+#### Legal Disclaimer: User Privacy and Data Handling
+
+Please note that you are solely responsible for complying with all applicable data protection and privacy laws. This includes, but is not limited to, obtaining user consent where required, securely storing the data, and providing users with necessary disclosures regarding how their data will be used. The author of this library assumes no liability for any legal consequences arising from the use or misuse of this functionality.
+
 #### Disable user updates
 
-Being an admin yourself, you will receive informative messages from the bot about the activities of your bot's users. To disable or enable it, send it the `/usersupdates` command.
+Disabling user privacy and being an admin yourself, you will receive informative messages from the bot about the activities of your bot's users. To disable or enable it, send it the `/usersupdates` command.
 
 ### Example 2: Other Commands and Message Handler
 
