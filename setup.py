@@ -12,7 +12,7 @@ else:
 
 setup(
     name="telegramlib",
-    version="0.1.1",
+    version="0.1.2",
     description="Easiest Python package to create Telegram bots.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
