@@ -5,10 +5,8 @@ def parse_requirements(filename):
     with open(filename, 'r') as f:
         return [line.strip() for line in f if line.strip() and not line.startswith('#')]
 
-if platform.system() == 'Darwin':
-    install_requires = parse_requirements('requirements-macos.txt')
-else:
-    install_requires = parse_requirements('requirements.txt')
+install_requires = parse_requirements('requirements.txt')
+install_requires += [package + "; sys_platform == 'darwin'" for package in parse_requirements('requirements-macos.txt') if package not in install_requires]
 
 setup(
     name="telegramlib",
