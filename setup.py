@@ -10,7 +10,7 @@ install_requires += [package + "; sys_platform == 'darwin'" for package in parse
 
 setup(
     name="telegramlib",
-    version="0.1.2",
+    version="0.1.3",
     description="Easiest Python package to create Telegram bots.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

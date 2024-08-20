@@ -4,17 +4,23 @@ All significant changes made to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Planned Features
+
+- **Scheduling Enhancements**: Introduce new functions to schedule actions with frequencies other than daily.
+- **Enhanced Message Handling**: Implement support for multiple types of messages beyond text.
+- **User Statistics Command**: Develop a Telegram command to return user statistics and graphs, such as active users and new users.
+
+## [0.1.3] - 2024-08-20
+
+### Fixed
+
+- **Windows (and maybe Linux) installation error**: Resolved an issue where the `setup.py` script did not put in `install_requires` the requirements of the operating system in which the installation takes place.
+
 ## [0.1.2] - 2024-08-19
 
 ### Added
 
 - **Disable user privacy**: The ability to explicitly control whether user information is saved. By default, user information is not saved to ensure privacy. However, this can be overridden by setting `privacy=False` in the `start_bot` function: `start_bot(token=TOKEN, ..., privacy=False)`.
-
-### Planned Features
-
-- **Scheduling Enhancements**: Introduce new functions to schedule actions with frequencies other than daily.
-- **Enhanced Message Handling**: Implement support for multiple types of messages beyond text.
-- **User Statistics Command**: Develop a Telegram command to return user statistics and graphs, such as active users and new users.
 
 ## [0.1.1] - 2024-08-17
 

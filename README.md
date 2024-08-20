@@ -4,7 +4,7 @@ Easiest Python package to create Telegram bots.
 
 Developed by [ilLancio](https://illancio.github.io).
 
-[![pypi](https://img.shields.io/badge/pypi-v0.1.2-blue)](https://pypi.org/project/telegramlib/)
+[![pypi](https://img.shields.io/badge/pypi-v0.1.3-blue)](https://pypi.org/project/telegramlib/)
 [![python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org)
 [![release date](https://img.shields.io/badge/release_date-august_2024-red)](https://github.com/ilLancio/telegramlib/blob/master/CHANGELOG.md)
 

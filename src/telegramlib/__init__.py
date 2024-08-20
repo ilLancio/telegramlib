@@ -5,7 +5,7 @@ telegramlib
 Easiest Python package to create Telegram bots.
 
 Version:
-    0.1.2
+    0.1.3
 
 Authors:
     Daniele Lanciotti (daniele9001@gmail.com) (https://illancio.github.io)
